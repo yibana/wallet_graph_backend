@@ -19,6 +19,9 @@ type MisttrackResult struct {
 }
 
 func OpenApiMistTrack(method, coin, address string) (OpenApiResult, error) {
+	if coin == "" {
+		coin = "eth"
+	}
 
 	var MongoInstance *db.MongoManger
 	switch method {
@@ -36,6 +39,7 @@ func OpenApiMistTrack(method, coin, address string) (OpenApiResult, error) {
 	find, err := MongoInstance.MongoFind(bson.M{
 		"filter": bson.M{
 			"address": address,
+			"coin":    strings.ToLower(coin),
 		},
 	})
 	var old_data bson.M
@@ -83,10 +87,12 @@ func OpenApiMistTrack(method, coin, address string) (OpenApiResult, error) {
 	err = MongoInstance.MongoUpdateOne(bson.M{
 		"filter": bson.M{
 			"address": address,
+			"coin":    strings.ToLower(coin),
 		},
 		"update": bson.M{
 			"$set": bson.M{
 				"address": address,
+				"coin":    strings.ToLower(coin),
 				"data":    result.Data,
 			},
 		},
